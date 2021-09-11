@@ -6,7 +6,7 @@ SELECT
     `vktounit`.`DateTransfer` as 'Дата перемещения',
     `vk`.`Name` as 'Техника',
     `vktype`.`Name` as 'Тип техники',
-    `vk`.`Cost`as 'Стоиомсть'
+    `vk`.`Cost`as 'Стоимость'
 FROM
     `unit`
 INNER JOIN `unitroom` ON `unit`.`ID` = `unitroom`.`UnitID`

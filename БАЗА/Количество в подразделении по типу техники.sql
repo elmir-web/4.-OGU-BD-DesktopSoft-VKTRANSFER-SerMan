@@ -1,5 +1,5 @@
 set @DateTransfer = '2021-09-10';
-select unit.Name, vktype.Name, COUNT(*) as kolvo
+select unit.Name as 'Имя подразделения', vktype.Name as 'Имя типа', COUNT(*) as kolvo
 from unit
 inner JOIN unitroom on unitroom.UnitID = unit.ID
 INNER JOIN vktounit on  vktounit.RoomID = unitroom.ID

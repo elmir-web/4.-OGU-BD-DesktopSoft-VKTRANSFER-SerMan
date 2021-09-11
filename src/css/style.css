@@ -1,0 +1,186 @@
+* {
+  margin: 0;
+  padding: 0;
+  -webkit-box-sizing: border-box;
+          box-sizing: border-box;
+  font-family: sans-serif;
+}
+
+body {
+  height: 500px;
+  background-color: #fff;
+}
+
+body div.main-app {
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-pack: justify;
+      -ms-flex-pack: justify;
+          justify-content: space-between;
+}
+
+body div.main-app aside {
+  width: 20%;
+  height: 515px;
+  padding: 15px;
+  text-align: center;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+  -webkit-box-orient: vertical;
+  -webkit-box-direction: normal;
+      -ms-flex-direction: column;
+          flex-direction: column;
+  -ms-flex-pack: distribute;
+      justify-content: space-around;
+  position: fixed;
+}
+
+body div.main-app aside button {
+  font-size: 14px;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  padding-left: 15px;
+  padding-right: 15px;
+  outline: none;
+  border: 0;
+  background-color: #fff;
+  border-bottom: 3px solid #000;
+}
+
+body div.main-app aside button:hover {
+  background-color: #000;
+  color: #fff;
+  border-bottom: 3px solid #ff0000;
+}
+
+body div.main-app aside button:active {
+  background-color: #51ff00;
+  color: #fff;
+  border-bottom: 3px solid #ff9900;
+}
+
+body div.main-app main {
+  width: 100%;
+  height: 515px;
+  padding: 15px;
+  margin-left: 20%;
+  overflow: auto;
+  color: #000;
+}
+
+body div.main-app main section#condition-default {
+  display: block;
+  font-size: 30px;
+}
+
+body div.main-app main section#condition-default span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  -webkit-transform: translate(-50%, -50%);
+          transform: translate(-50%, -50%);
+}
+
+body div.main-app main section#condition-vktype {
+  display: none;
+}
+
+body div.main-app main section#condition-vk {
+  display: none;
+}
+
+body div.main-app main section#condition-worker {
+  display: none;
+}
+
+body div.main-app main section#condition-unit {
+  display: none;
+}
+
+body div.main-app main section#condition-unitpattern {
+  display: none;
+}
+
+body div.main-app main section#condition-unitroom {
+  display: none;
+}
+
+body div.main-app main section#condition-vktounit {
+  display: none;
+}
+
+body div.main-app main div.display-controller h2 {
+  font-size: 16px;
+}
+
+body div.main-app main div.display-controller form {
+  margin-top: 15px;
+  display: -webkit-box;
+  display: -ms-flexbox;
+  display: flex;
+}
+
+body div.main-app main div.display-controller form input {
+  width: 200px;
+  height: 40px;
+  padding-left: 10px;
+  font-size: 20px;
+  border: 0;
+  border-bottom: 2px solid #000;
+  outline: 0;
+}
+
+body div.main-app main div.display-controller form button {
+  height: 40px;
+  padding-left: 15px;
+  padding-right: 15px;
+  font-size: 20px;
+  border: 0;
+  border-bottom: 2px solid #000;
+  outline: 0;
+  margin-left: 15px;
+  outline: none;
+  background-color: #fff;
+}
+
+body div.main-app main div.display-controller form button:hover {
+  background-color: #000;
+  color: #fff;
+  border-bottom: 3px solid #ff0000;
+}
+
+body div.main-app main div.display-controller form button:active {
+  background-color: #51ff00;
+  color: #fff;
+  border-bottom: 3px solid #ff9900;
+}
+
+table {
+  border: 1px solid #eee;
+  table-layout: fixed;
+  width: 100%;
+  margin-bottom: 20px;
+}
+
+table th {
+  font-weight: bold;
+  padding: 5px;
+  background: #efefef;
+  border: 1px solid #dddddd;
+}
+
+table td {
+  padding: 5px 10px;
+  border: 1px solid #eee;
+  text-align: left;
+}
+
+table tbody tr:nth-child(odd) {
+  background: #fff;
+}
+
+table tbody tr:nth-child(even) {
+  background: #f7f7f7;
+}

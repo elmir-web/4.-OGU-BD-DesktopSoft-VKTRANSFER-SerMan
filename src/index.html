@@ -1,10 +1,92 @@
 <!DOCTYPE html>
 <html>
   <head>
-    <meta charset="utf-8">
+    <link rel="stylesheet" href="css/style.css" />
+    <script src="js/main.js"></script>
+
+    <meta charset="utf-8" />
+
     <title></title>
   </head>
   <body>
-    Well hey there!!!
+    <div class="main-app">
+      <aside>
+        <button id="button-menu-vktype">Типы техники</button>
+        <button id="button-menu-vk">Техника</button>
+        <button id="button-menu-worker">Сотрудники</button>
+        <button id="button-menu-unit">Подразделения</button>
+        <button id="button-menu-unitpattern">Паттерны сотрудников</button>
+        <button id="button-menu-unitroom">Комнаты</button>
+        <button id="button-menu-vktounit">Перемещение техники</button>
+      </aside>
+
+      <main>
+        <section id="condition-default">
+          <span>
+            <pre>            Выберите<br />            раздел<br />            в<br /> <------- меню<br />            навигации<br />            левой<br />            части<br />            программы</pre>
+          </span>
+        </section>
+
+        <section id="condition-vktype">
+          <div class="display-print">
+            [ отображение таблицы с видам техники ]
+          </div>
+        </section>
+
+        <section id="condition-vk">
+          <div class="display-print">[ отображение таблицы техники ]</div>
+        </section>
+
+        <section id="condition-worker">
+          <div class="display-print">[ отображение таблицы сотрудников ]</div>
+
+          <div class="display-controller">
+            <h2>Создать нового/Изменить сотрудника</h2>
+
+            <form name="formFromCreateWorker">
+              <input
+                type="text"
+                id="input-fio-worker-create"
+                placeholder="Введите ФИО"
+              />
+              <button id="butt-create-worker">Изменить/Создать</button>
+            </form>
+          </div>
+        </section>
+
+        <section id="condition-unit">
+          <div class="display-print">[ отображение таблицы подразделений ]</div>
+        </section>
+
+        <section id="condition-unitpattern">
+          <div class="display-print">
+            [ отображение таблицы принадлежности сотрудников ]
+          </div>
+
+          <div class="display-controller">
+            <h2>Создать новые/Изменить паттерны сотрудников</h2>
+
+            <form name="formFromCreateUnitPattern">
+              <!-- <input
+                type="text"
+                id="input-fio-unitpattern-create"
+                placeholder="Введите ФИО"
+              /> -->
+              <button id="butt-create-unitpattern">Изменить/Создать</button>
+            </form>
+          </div>
+        </section>
+
+        <section id="condition-unitroom">
+          <div class="display-print">[ отображение таблицы комнат ]</div>
+        </section>
+
+        <section id="condition-vktounit">
+          <div class="display-print">
+            [ отображение таблицы перемещения техники ]
+          </div>
+        </section>
+      </main>
+    </div>
   </body>
 </html>

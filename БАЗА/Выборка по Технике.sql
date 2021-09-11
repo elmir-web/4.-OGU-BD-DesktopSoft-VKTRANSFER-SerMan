@@ -9,3 +9,6 @@ LEFT JOIN `vktounit` ON `vktounit`.`RoomID` = `unitroom`.`ID`
 LEFT JOIN `vk` ON `vk`.`ID` = `vktounit`.`VKID`    
 where vk.id = 1
 order by `vktounit`.`DateTransfer`
+
+
+// менять vk.id = 1
