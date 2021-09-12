@@ -48,6 +48,39 @@
 
         <section id="condition-vk">
           <div class="display-print">[ отображение таблицы техники ]</div>
+
+          <div class="display-controller">
+            <h2>Создать новую/Изменить технику</h2>
+
+            <form name="formFromCreateVK">
+              <input
+                type="text"
+                id="input-name-vk-create"
+                placeholder="Введите название техники"
+              />
+              <input
+                type="text"
+                id="input-model-vk-create"
+                placeholder="Введите модель техники"
+              />
+              <input
+                type="text"
+                id="input-DatePurchase-vk-create"
+                placeholder="Введите дату прихода техники"
+              />
+              <input
+                type="text"
+                id="input-cost-vk-create"
+                placeholder="Введите цену техники"
+              />
+              <select name="FromVKTypeVKCrt" size="1">
+                <option value="fsdfsdf">fsdfsdf</option>
+                <option value="323232323">323232323</option>
+                <option value="qwqwqwqwqwq">qwqwqwqwqwq</option>
+              </select>
+              <button id="butt-create-vk">Изменить/Создать</button>
+            </form>
+          </div>
         </section>
 
         <section id="condition-worker">
@@ -69,6 +102,29 @@
 
         <section id="condition-unit">
           <div class="display-print">[ отображение таблицы подразделений ]</div>
+
+          <div class="display-controller">
+            <h2>Создать новые/Изменить подразделение</h2>
+
+            <form name="formFromCreateUnit">
+              <input
+                type="text"
+                id="input-number-unit-create"
+                placeholder="Введите номер"
+              />
+              <input
+                type="text"
+                id="input-name-unit-create"
+                placeholder="Введите название"
+              />
+              <input
+                type="text"
+                id="input-NameShort-unit-create"
+                placeholder="Введите сокращение"
+              />
+              <button id="butt-create-unit">Изменить/Создать</button>
+            </form>
+          </div>
         </section>
 
         <section id="condition-unitpattern">
@@ -95,7 +151,6 @@
                 <option value="323232323">323232323</option>
                 <option value="qwqwqwqwqwq">qwqwqwqwqwq</option>
               </select>
-              <br />
               <select name="FromBossUnitPatternCrt" size="1">
                 <option value="0">Обычный</option>
                 <option value="1">Босс</option>
@@ -111,6 +166,24 @@
 
         <section id="condition-unitroom">
           <div class="display-print">[ отображение таблицы комнат ]</div>
+
+          <div class="display-controller">
+            <h2>Создать новую/Изменить комнату</h2>
+
+            <form name="formFromCreateUnitRoom">
+              <select name="FromUnitUnitRoom" size="1">
+                <option value="fsdfsdf">fsdfsdf</option>
+                <option value="323232323">323232323</option>
+                <option value="qwqwqwqwqwq">qwqwqwqwqwq</option>
+              </select>
+              <input
+                type="text"
+                id="input-name-unitroom-create"
+                placeholder="Введите название"
+              />
+              <button id="butt-create-unitroom">Изменить/Создать</button>
+            </form>
+          </div>
         </section>
 
         <section id="condition-vktounit">
