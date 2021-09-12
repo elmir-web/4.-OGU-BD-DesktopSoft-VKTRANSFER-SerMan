@@ -12,3 +12,4 @@ order by `vktounit`.`DateTransfer`
 
 
 // менять vk.id = 1
+// все движения техники по ID по подразделениям

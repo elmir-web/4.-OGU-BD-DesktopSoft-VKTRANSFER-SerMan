@@ -18,3 +18,6 @@ where 1 = 1
 --  and vk.ID = 1
   and vktounit.DateTransfer <= @DateTransfer
 order by `unit`.`Name`, `unitroom`.`Name`, `vktounit`.`DateTransfer`
+
+// покажет всю технику в подразделении на эту дату без матотвецлица
+--  and unit.ID = 1 

@@ -273,6 +273,12 @@ async function showVK() {
     .getGlobal("connectMySQL")
     .execute("select * from vktype");
 
+  document.querySelector("#input-DatePurchase-vk-create").placeholder =
+    moment().format("YYYY-MM-DD");
+
+  document.querySelector("#input-DatePurchase-vk-create").value =
+    moment().format("YYYY-MM-DD");
+
   for (
     let i =
       document.querySelector("select[name=FromVKTypeVKCrt]").options.length - 1;
@@ -312,6 +318,13 @@ async function showVK() {
 
   if (rowsVK.length) {
     for (let i = 0; i < rowsVK.length; i++) {
+      let tempNameVKType = "";
+
+      for (let j = 0; j < rowsAllTypeVK.length; j++) {
+        if (rowsAllTypeVK[j]["ID"] === rowsVK[i]["TypeID"])
+          tempNameVKType = rowsAllTypeVK[j]["Name"];
+      }
+
       displayPrint += `
       <tr>
         <td>${rowsVK[i]["ID"]} | <button onclick="DeleteVK(${
@@ -323,7 +336,7 @@ async function showVK() {
         <td>${rowsVK[i]["Model"]}</td>
         <td>${moment(rowsVK[i]["DatePurchase"]).format("YYYY-MM-DD")}</td>
         <td>${rowsVK[i]["Cost"]}</td>
-        <td>${rowsAllTypeVK[rowsVK[i]["TypeID"] - 1]["Name"]}</td>
+        <td>${tempNameVKType}</td>
       </tr>
       `;
     }
