@@ -54,6 +54,18 @@ window.onload = function () {
     .querySelector("#butt-create-worker")
     .addEventListener("click", async (evt) => await CreateWorker(evt));
   // ____________________________________________________________ Сотрудники
+
+  // ____________________________________________________________ Сотрудники
+  document
+    .querySelector("#butt-create-unitpattern")
+    .addEventListener("click", async (evt) => await CreateUnitPattern(evt));
+  // ____________________________________________________________ Сотрудники
+
+  // ____________________________________________________________ Сотрудники
+  document
+    .querySelector("#butt-create-vktype")
+    .addEventListener("click", async (evt) => await CreateVKType(evt));
+  // ____________________________________________________________ Сотрудники
 };
 
 function DisplayShowCondition(selectorCondition) {
@@ -112,7 +124,7 @@ async function showVKType() {
     for (let i = 0; i < rowsVKType.length; i++) {
       displayPrint += `
       <tr>
-        <td>${rowsVKType[i]["ID"]}</td>
+        <td>${rowsVKType[i]["ID"]} | <button onclick="DeleteVKType(${rowsVKType[i]["ID"]})">X</button><button onclick="modeReadVKType(${rowsVKType[i]["ID"]})">R</button></td>
         <td>${rowsVKType[i]["Name"]}</td>
       </tr>
       `;
@@ -132,6 +144,105 @@ async function showVKType() {
 
   document.querySelector("#condition-vktype .display-print").innerHTML =
     displayPrint;
+
+  statusReadCreate = 0;
+
+  document.querySelector("#butt-create-vktype").innerHTML = "Создать";
+  document.querySelector("#condition-vktype h2").innerHTML =
+    "Создать новый тип";
+}
+
+// создать / редактировать тип техники
+async function CreateVKType(evt) {
+  evt.preventDefault();
+
+  let vkType = document.querySelector("#input-vktype-vktype-create").value;
+
+  if (statusReadCreate == 0 /* создать */) {
+    await remote
+      .getGlobal("connectMySQL")
+      .execute(`insert into vktype (Name) values ('${vkType}')`);
+  } else if (statusReadCreate == 1 /* изменить */) {
+    if (idReadCreate == 0) {
+      window.alert("Не выбран сотрудник");
+      return;
+    }
+    await remote
+      .getGlobal("connectMySQL")
+      .execute(
+        `UPDATE vktype SET Name = '${vkType}' WHERE ID = ${idReadCreate}`
+      );
+  }
+
+  await showVKType();
+}
+
+// измененить тип на создание или редактирование
+async function modeReadVKType(unitPatternID) {
+  if (idReadCreate !== unitPatternID) {
+    idReadCreate = unitPatternID;
+
+    statusReadCreate = 1;
+
+    document.querySelector("#butt-create-vktype").innerHTML = "Изменить";
+    document.querySelector(
+      "#condition-vktype h2"
+    ).innerHTML = `Изменить тип ID: ${unitPatternID}`;
+  } else {
+    statusReadCreate = !statusReadCreate;
+
+    if (statusReadCreate == 0) {
+      document.querySelector("#butt-create-vktype").innerHTML = "Создать";
+      document.querySelector("#condition-vktype h2").innerHTML =
+        "Создать нового сотрудника";
+    } else if (statusReadCreate == 1) {
+      document.querySelector("#butt-create-vktype").innerHTML = "Изменить";
+      document.querySelector(
+        "#condition-vktype h2"
+      ).innerHTML = `Изменить сотрудника ID: ${unitPatternID}`;
+    }
+  }
+}
+
+// удалить тип техники
+async function DeleteVKType(vkTypeID) {
+  const [rowsVK] = await remote
+    .getGlobal("connectMySQL")
+    .execute(`SELECT * FROM vk WHERE TypeID = ${vkTypeID}`);
+
+  if (rowsVK.length) {
+    let tempAllIDsVK = [];
+
+    for (let i = 0; i < rowsVK.length; i++) {
+      tempAllIDsVK.push(rowsVK[i]["ID"]);
+    }
+
+    for (let i = 0; i < tempAllIDsVK.length; i++) {
+      const [rowsVKToUnit] = await remote
+        .getGlobal("connectMySQL")
+        .execute(`SELECT * FROM vktounit WHERE VKID = ${tempAllIDsVK[i]}`);
+
+      if (rowsVKToUnit.length) {
+        for (let j = 0; j < rowsVKToUnit.length; j++) {
+          await remote
+            .getGlobal("connectMySQL")
+            .execute(
+              `DELETE FROM vktounit WHERE ID = ${rowsVKToUnit[j]["ID"]}`
+            );
+        }
+      }
+
+      await remote
+        .getGlobal("connectMySQL")
+        .execute(`DELETE FROM vk WHERE ID = ${tempAllIDsVK[i]}`);
+    }
+  }
+
+  await remote
+    .getGlobal("connectMySQL")
+    .execute(`DELETE FROM vktype WHERE ID = ${vkTypeID}`);
+
+  await showVKType();
 }
 
 // показать технику
@@ -271,8 +382,9 @@ async function modeReadWorker(workerID) {
     statusReadCreate = 1;
 
     document.querySelector("#butt-create-worker").innerHTML = "Изменить";
-    document.querySelector("#condition-worker h2").innerHTML =
-      "Изменить сотрудника";
+    document.querySelector(
+      "#condition-worker h2"
+    ).innerHTML = `Изменить сотрудника ID: ${workerID}`;
   } else {
     statusReadCreate = !statusReadCreate;
 
@@ -282,8 +394,9 @@ async function modeReadWorker(workerID) {
         "Создать нового сотрудника";
     } else if (statusReadCreate == 1) {
       document.querySelector("#butt-create-worker").innerHTML = "Изменить";
-      document.querySelector("#condition-worker h2").innerHTML =
-        "Изменить сотрудника";
+      document.querySelector(
+        "#condition-worker h2"
+      ).innerHTML = `Изменить сотрудника ID: ${workerID}`;
     }
   }
 }
@@ -366,10 +479,54 @@ async function showUnitPattern() {
     .getGlobal("connectMySQL")
     .execute("select * from unit");
 
-  // продолжить тут
   [rowsAllWorker] = await remote
     .getGlobal("connectMySQL")
     .execute("select * from worker");
+
+  for (
+    let i =
+      document.querySelector("select[name=FromUnitUnitPatternCrt]").options
+        .length - 1;
+    i >= 0;
+    i--
+  ) {
+    document.querySelector("select[name=FromUnitUnitPatternCrt]").options[i] =
+      null;
+  } // Очищаем выпадающие списки
+
+  if (rowsAllUnit.length) {
+    for (let j = 0; j < rowsAllUnit.length; j++) {
+      let newOption1 = new Option(rowsAllUnit[j]["Name"], rowsAllUnit[j]["ID"]);
+
+      document.querySelector("select[name=FromUnitUnitPatternCrt]").options[
+        document.querySelector("select[name=FromUnitUnitPatternCrt]").length
+      ] = newOption1;
+    }
+  }
+
+  for (
+    let i =
+      document.querySelector("select[name=FromWorkerUnitPatternCrt]").options
+        .length - 1;
+    i >= 0;
+    i--
+  ) {
+    document.querySelector("select[name=FromWorkerUnitPatternCrt]").options[i] =
+      null;
+  } // Очищаем выпадающие списки
+
+  if (rowsAllWorker.length) {
+    for (let j = 0; j < rowsAllWorker.length; j++) {
+      let newOption1 = new Option(
+        rowsAllWorker[j]["FIO"],
+        rowsAllWorker[j]["ID"]
+      );
+
+      document.querySelector("select[name=FromWorkerUnitPatternCrt]").options[
+        document.querySelector("select[name=FromWorkerUnitPatternCrt]").length
+      ] = newOption1;
+    }
+  }
 
   let displayPrint = `
   <table style="font-size: 14px;">
@@ -432,6 +589,104 @@ async function showUnitPattern() {
 
   document.querySelector("#condition-unitpattern .display-print").innerHTML =
     displayPrint;
+
+  document.querySelector("#butt-create-unitpattern").innerHTML = "Создать";
+  statusReadCreate = 0;
+  document.querySelector("#condition-unitpattern h2").innerHTML =
+    "Создать новые паттерны сотрудников";
+}
+
+// создать / редактировать принадлежность сотрудников
+async function CreateUnitPattern(evt) {
+  evt.preventDefault();
+
+  let indexUnitUnitPattern = document.querySelector(
+    "select[name=FromUnitUnitPatternCrt]"
+  ).options.selectedIndex;
+  let valueUnitUnitPattern = document.querySelector(
+    "select[name=FromUnitUnitPatternCrt]"
+  ).options[indexUnitUnitPattern].value;
+
+  let functionUnitPattern = document.querySelector(
+    "#input-function-unitpattern-create"
+  ).value;
+
+  let indexWorkerUnitPattern = document.querySelector(
+    "select[name=FromWorkerUnitPatternCrt]"
+  ).options.selectedIndex;
+  let valueWorkerUnitPattern = document.querySelector(
+    "select[name=FromWorkerUnitPatternCrt]"
+  ).options[indexWorkerUnitPattern].value;
+
+  let indexBossUnitPattern = document.querySelector(
+    "select[name=FromBossUnitPatternCrt]"
+  ).options.selectedIndex;
+  let valueBossUnitPattern = document.querySelector(
+    "select[name=FromBossUnitPatternCrt]"
+  ).options[indexBossUnitPattern].value;
+
+  let indexMOLUnitPattern = document.querySelector(
+    "select[name=FromMOLUnitPatternCrt]"
+  ).options.selectedIndex;
+  let valueMOLUnitPattern = document.querySelector(
+    "select[name=FromMOLUnitPatternCrt]"
+  ).options[indexMOLUnitPattern].value;
+
+  if (statusReadCreate == 0 /* создать */) {
+    await remote
+      .getGlobal("connectMySQL")
+      .execute(
+        `INSERT INTO unitpattern (UnitID, unitpattern.Function, WorkerID, IsBoss, IsMOL) VALUES ('${valueUnitUnitPattern}', '${functionUnitPattern}', '${valueWorkerUnitPattern}', '${valueBossUnitPattern}', '${valueMOLUnitPattern}')`
+      );
+  } else if (statusReadCreate == 1 /* изменить */) {
+    if (idReadCreate == 0) {
+      window.alert("Не выбран сотрудник");
+      return;
+    }
+
+    await remote
+      .getGlobal("connectMySQL")
+      .execute(
+        `update unitpattern set UnitID = '${valueUnitUnitPattern}', unitpattern.Function = '${functionUnitPattern}', WorkerID = '${valueWorkerUnitPattern}', IsBoss = '${valueBossUnitPattern}', IsMOL = '${valueMOLUnitPattern}' where id = ${idReadCreate}`
+      );
+  }
+
+  await showUnitPattern();
+}
+
+// измененить тип на создание или редактирование
+async function modeReadUnitPattern(unitPatternID) {
+  if (idReadCreate !== unitPatternID) {
+    idReadCreate = unitPatternID;
+
+    statusReadCreate = 1;
+
+    document.querySelector("#butt-create-unitpattern").innerHTML = "Изменить";
+    document.querySelector(
+      "#condition-unitpattern h2"
+    ).innerHTML = `Изменить паттерны сотрудника ID:${unitPatternID}`;
+  } else {
+    statusReadCreate = !statusReadCreate;
+    if (statusReadCreate == 0) {
+      document.querySelector("#butt-create-unitpattern").innerHTML = "Создать";
+      document.querySelector("#condition-unitpattern h2").innerHTML =
+        "Создать нового сотрудника";
+    } else if (statusReadCreate == 1) {
+      document.querySelector("#butt-create-unitpattern").innerHTML = "Изменить";
+      document.querySelector(
+        "#condition-unitpattern h2"
+      ).innerHTML = `Изменить паттерны сотрудника ID:${unitPatternID}`;
+    }
+  }
+}
+
+// удалить паттерны сотрудника
+async function DeleteUnitPattern(unitPatternID) {
+  await remote
+    .getGlobal("connectMySQL")
+    .execute(`DELETE FROM unitpattern WHERE ID = ${unitPatternID}`);
+
+  await showUnitPattern();
 }
 
 // показать комнаты подразделений

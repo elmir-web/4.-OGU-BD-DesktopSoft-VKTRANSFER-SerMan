@@ -105,7 +105,7 @@ body {
 
         form {
           margin-top: 15px;
-          display: flex;
+          // display: flex;
 
           input {
             width: 200px;
@@ -115,6 +115,19 @@ body {
             border: 0;
             border-bottom: 2px solid #000;
             outline: 0;
+            margin-left: 15px;
+          }
+
+          select {
+            height: 40px;
+            padding-left: 15px;
+            padding-right: 15px;
+            font-size: 20px;
+            border: 0;
+            border-bottom: 2px solid #000;
+            outline: 0;
+            background-color: #fff;
+            margin-left: 15px;
           }
 
           button {

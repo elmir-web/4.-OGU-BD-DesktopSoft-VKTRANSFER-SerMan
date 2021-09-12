@@ -117,9 +117,6 @@ body div.main-app main div.display-controller h2 {
 
 body div.main-app main div.display-controller form {
   margin-top: 15px;
-  display: -webkit-box;
-  display: -ms-flexbox;
-  display: flex;
 }
 
 body div.main-app main div.display-controller form input {
@@ -130,6 +127,19 @@ body div.main-app main div.display-controller form input {
   border: 0;
   border-bottom: 2px solid #000;
   outline: 0;
+  margin-left: 15px;
+}
+
+body div.main-app main div.display-controller form select {
+  height: 40px;
+  padding-left: 15px;
+  padding-right: 15px;
+  font-size: 20px;
+  border: 0;
+  border-bottom: 2px solid #000;
+  outline: 0;
+  background-color: #fff;
+  margin-left: 15px;
 }
 
 body div.main-app main div.display-controller form button {

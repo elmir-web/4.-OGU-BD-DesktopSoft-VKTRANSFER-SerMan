@@ -31,6 +31,19 @@
           <div class="display-print">
             [ отображение таблицы с видам техники ]
           </div>
+
+          <div class="display-controller">
+            <h2>Создать новый/Изменить вид техники</h2>
+
+            <form name="formFromCreateVKType">
+              <input
+                type="text"
+                id="input-vktype-vktype-create"
+                placeholder="Введите тип (вид) техники"
+              />
+              <button id="butt-create-vktype">Изменить/Создать</button>
+            </form>
+          </div>
         </section>
 
         <section id="condition-vk">
@@ -67,11 +80,30 @@
             <h2>Создать новые/Изменить паттерны сотрудников</h2>
 
             <form name="formFromCreateUnitPattern">
-              <!-- <input
+              <select name="FromUnitUnitPatternCrt" size="1">
+                <option value="fsdfsdf">fsdfsdf</option>
+                <option value="323232323">323232323</option>
+                <option value="qwqwqwqwqwq">qwqwqwqwqwq</option>
+              </select>
+              <input
                 type="text"
-                id="input-fio-unitpattern-create"
-                placeholder="Введите ФИО"
-              /> -->
+                id="input-function-unitpattern-create"
+                placeholder="Введите должность"
+              />
+              <select name="FromWorkerUnitPatternCrt" size="1">
+                <option value="fsdfsdf">fsdfsdf</option>
+                <option value="323232323">323232323</option>
+                <option value="qwqwqwqwqwq">qwqwqwqwqwq</option>
+              </select>
+              <br />
+              <select name="FromBossUnitPatternCrt" size="1">
+                <option value="0">Обычный</option>
+                <option value="1">Босс</option>
+              </select>
+              <select name="FromMOLUnitPatternCrt" size="1">
+                <option value="0">Не ответственный</option>
+                <option value="1">Материально-ответственное лицо</option>
+              </select>
               <button id="butt-create-unitpattern">Изменить/Создать</button>
             </form>
           </div>
