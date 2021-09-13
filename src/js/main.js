@@ -9,6 +9,7 @@ let rowsAllVK = [];
 
 let statusReadCreate = 0;
 let idReadCreate = 0;
+let statusVKToUnitShow = 0;
 
 window.onload = function () {
   // ____________________________________________________________ навигация в меню
@@ -53,6 +54,18 @@ window.onload = function () {
   document
     .querySelector("#butt-create-worker")
     .addEventListener("click", async (evt) => await CreateWorker(evt));
+
+  document
+    .querySelector("#butt-show-worker")
+    .addEventListener("click", async (evt) => {
+      evt.preventDefault();
+
+      showWorker();
+    });
+
+  document
+    .querySelector("#butt-show-report-boss-unit")
+    .addEventListener("click", async (evt) => await ShowBossUnit(evt));
   // ____________________________________________________________ Сотрудники
 
   // ____________________________________________________________ Паттерны сотрудников
@@ -71,12 +84,42 @@ window.onload = function () {
   document
     .querySelector("#butt-create-vk")
     .addEventListener("click", async (evt) => await CreateVK(evt));
+
+  document
+    .querySelector("#butt-show-vk")
+    .addEventListener("click", async (evt) => {
+      evt.preventDefault();
+
+      await showVK();
+    });
+
+  document
+    .querySelector("#butt-show-report-vkmoving-tounit")
+    .addEventListener("click", async (evt) => await ShowVKMovingToUnit(evt));
   // ____________________________________________________________ Техника
 
   // ____________________________________________________________ Подразделения
   document
     .querySelector("#butt-create-unit")
     .addEventListener("click", async (evt) => await CreateUnit(evt));
+
+  document.querySelector("#butt-show-unit").addEventListener("click", (evt) => {
+    evt.preventDefault();
+
+    showUnit();
+  });
+
+  document
+    .querySelector("#butt-show-report-vk-tounit-date")
+    .addEventListener("click", async (evt) => await ShowVKToUnitDate(evt));
+
+  document
+    .querySelector("#butt-show-report-vk-tounit-mol-date")
+    .addEventListener("click", async (evt) => await ShowVKToUnitMolDate(evt));
+
+  document
+    .querySelector("#butt-show-report-quantvk-tounit-date")
+    .addEventListener("click", async (evt) => await ShowQuantVKToUnitDate(evt));
   // ____________________________________________________________ Подразделения
 
   // ____________________________________________________________ Комнаты
@@ -84,6 +127,22 @@ window.onload = function () {
     .querySelector("#butt-create-unitroom")
     .addEventListener("click", async (evt) => await CreateUnitRoom(evt));
   // ____________________________________________________________ Комнаты
+
+  // ____________________________________________________________ Перемещение техники
+  document
+    .querySelector("#butt-move-VKToUnit")
+    .addEventListener("click", async (evt) => await MoveVKToUnit(evt));
+
+  document
+    .querySelector("#butt-show-report-vktounit")
+    .addEventListener("click", async (evt) => {
+      evt.preventDefault();
+
+      if (statusVKToUnitShow == 0) await showVKToUnit("all");
+      else if (statusVKToUnitShow == 1) await showVKToUnit("five");
+      else if (statusVKToUnitShow == 2) await showVKToUnit("ten");
+    });
+  // ____________________________________________________________ Перемещение техники
 };
 
 function DisplayShowCondition(selectorCondition) {
@@ -95,6 +154,7 @@ function DisplayShowCondition(selectorCondition) {
 
   statusReadCreate = 0;
   idReadCreate = 0;
+  statusVKToUnitShow = 0;
 
   switch (selectorCondition) {
     case "#condition-vktype":
@@ -116,7 +176,7 @@ function DisplayShowCondition(selectorCondition) {
       showUnitRoom();
       break;
     case "#condition-vktounit":
-      showVKToUnit();
+      showVKToUnit("five");
       break;
   }
 }
@@ -362,6 +422,64 @@ async function showVK() {
     "Создать новую технику";
 }
 
+async function ShowVKMovingToUnit(evt) {
+  evt.preventDefault();
+
+  if (idReadCreate === 0) {
+    window.alert("Не выбрана техника");
+    return;
+  }
+
+  document.querySelector("form[name=formFromCreateVK] h2").innerHTML =
+    "ОТЧЕТ: Все движения техники ID: " + idReadCreate + " по подразделениям";
+
+  const [rowsAllVKMovingToUnit] = await remote
+    .getGlobal("connectMySQL")
+    .execute(
+      `SELECT vk.Name as 'Техника', unit.Name as 'Подразделение', vktounit.DateTransfer as 'Дата получения' FROM unit LEFT JOIN unitroom ON unitroom.UnitID = unit.ID LEFT JOIN vktounit ON vktounit.RoomID = unitroom.ID LEFT JOIN vk ON vk.ID = vktounit.VKID where vk.id = ${idReadCreate} order by vktounit.DateTransfer`
+    );
+
+  let displayPrint = `
+  <table style="font-size: 14px;">
+    <thead>
+      <tr>
+        <th>Техника</th>
+        <th>Подразделение</th>
+        <th>Дата получения</th>
+      </tr>
+    </thead>
+    <tbody>
+  `;
+
+  if (rowsAllVKMovingToUnit.length) {
+    for (let i = 0; i < rowsAllVKMovingToUnit.length; i++) {
+      displayPrint += `
+      <tr>
+        <td>${rowsAllVKMovingToUnit[i]["Техника"]}</td>
+        <td>${rowsAllVKMovingToUnit[i]["Подразделение"]}</td>
+        <td>${moment(rowsAllVKMovingToUnit[i]["Дата получения"]).format(
+          "YYYY-MM-DD"
+        )}</td>
+      </tr>
+      `;
+    }
+  } else {
+    displayPrint += `
+    <tr>
+      <td colspan="3">Нет информации для вывода</td>
+    </tr>
+    `;
+  }
+
+  displayPrint += `
+    </tbody>
+  </table>
+  `;
+
+  document.querySelector("#condition-vk .display-print").innerHTML =
+    displayPrint;
+}
+
 async function DeleteVK(vkID) {
   const [rowsVKToUnit] = await remote
     .getGlobal("connectMySQL")
@@ -490,6 +608,52 @@ async function showWorker() {
     "Создать нового сотрудника";
 }
 
+async function ShowBossUnit(evt) {
+  evt.preventDefault();
+
+  const [rowsAllBossUnit] = await remote
+    .getGlobal("connectMySQL")
+    .execute(
+      `SELECT  unit.Name as 'Подразделение', worker.FIO as 'Сотрудник' FROM unitpattern LEFT JOIN worker ON worker.ID = unitpattern.WorkerID  LEFT JOIN unit ON unit.ID = unitpattern.UnitID where unitpattern.IsBoss = 1`
+    );
+
+  let displayPrint = `
+  <table style="font-size: 14px;">
+    <thead>
+      <tr>
+        <th>Подразделение</th>
+        <th>Сотрудник</th>
+      </tr>
+    </thead>
+    <tbody>
+  `;
+
+  if (rowsAllBossUnit.length) {
+    for (let i = 0; i < rowsAllBossUnit.length; i++) {
+      displayPrint += `
+      <tr>
+        <td>${rowsAllBossUnit[i]["Подразделение"]}</td>
+        <td>${rowsAllBossUnit[i]["Сотрудник"]}</td>
+      </tr>
+      `;
+    }
+  } else {
+    displayPrint += `
+    <tr>
+      <td colspan="2">Нет информации для вывода</td>
+    </tr>
+    `;
+  }
+
+  displayPrint += `
+    </tbody>
+  </table>
+  `;
+
+  document.querySelector("#condition-worker .display-print").innerHTML =
+    displayPrint;
+}
+
 // создать / редактировать сотрудника
 async function CreateWorker(evt) {
   evt.preventDefault();
@@ -614,6 +778,237 @@ async function showUnit() {
   document.querySelector("#butt-create-unit").innerHTML = "Создать";
   document.querySelector("#condition-unit h2").innerHTML =
     "Создать новое подразделение";
+  document.querySelector("form[name=formFromCreateUnit] h2").innerHTML =
+    "ОТЧЕТ: Покажет всю технику в подразделении на дату";
+
+  document.querySelector("#input-date-showvk-tounit").value =
+    moment().format("YYYY-MM-DD");
+  document.querySelector("#input-date-showvk-tounit").placeholder =
+    moment().format("YYYY-MM-DD");
+}
+
+async function ShowVKToUnitDate(evt) {
+  evt.preventDefault();
+
+  if (idReadCreate === 0) {
+    window.alert("Не выбрано подразделение");
+    return;
+  }
+
+  let tempDate = document.querySelector("#input-date-showvk-tounit").value;
+
+  document.querySelector("form[name=formFromCreateUnit] h2").innerHTML =
+    "ОТЧЕТ: Покажет всю технику в подразделении ID: " +
+    idReadCreate +
+    " на дату: " +
+    tempDate;
+
+  await remote
+    .getGlobal("connectMySQL")
+    .execute(`set @DateTransfer = '${tempDate}';`);
+
+  const [rowsAllVKToUnitDate] = await remote
+    .getGlobal("connectMySQL")
+    .execute(
+      `SELECT unit.Name as 'Подразделение', unitroom.Name as 'Комната', vktounit.DateTransfer as 'Дата перемещения', vk.Name as 'Техника', vktype.Name as 'Тип техники', vk.Cost as 'Стоимость' FROM unit INNER JOIN unitroom ON unit.ID = unitroom.UnitID INNER JOIN vktounit ON unitroom.ID = vktounit.RoomID and vktounit.DateTransfer = (SELECT max(vu.DateTransfer) from vktounit as vu where vu.VKID = vktounit.VKID and vu.DateTransfer <= @DateTransfer) INNER JOIN vk ON vk.ID = vktounit.VKID INNER JOIN vktype ON vktype.ID = vk.TypeID where 1 = 1 and unit.ID = ${idReadCreate} and vktounit.DateTransfer <= @DateTransfer order by unit.Name, unitroom.Name, vktounit.DateTransfer;`
+    );
+
+  let displayPrint = `
+  <table style="font-size: 14px;">
+    <thead>
+      <tr>
+        <th>Подразделение</th>
+        <th>Комната</th>
+        <th>Дата перемещения</th>
+        <th>Техника</th>
+        <th>Тип техники</th>
+        <th>Стоимость</th>
+      </tr>
+    </thead>
+    <tbody>
+  `;
+
+  if (rowsAllVKToUnitDate.length) {
+    for (let i = 0; i < rowsAllVKToUnitDate.length; i++) {
+      displayPrint += `
+      <tr>
+        <td>${rowsAllVKToUnitDate[i]["Подразделение"]}</td>
+        <td>${rowsAllVKToUnitDate[i]["Комната"]}</td>
+        <td>${moment(rowsAllVKToUnitDate[i]["Дата перемещения"]).format(
+          "YYYY-MM-DD"
+        )}</td>
+        <td>${rowsAllVKToUnitDate[i]["Техника"]}</td>
+        <td>${rowsAllVKToUnitDate[i]["Тип техники"]}</td>
+        <td>${rowsAllVKToUnitDate[i]["Стоимость"]}</td>
+      </tr>
+      `;
+    }
+  } else {
+    displayPrint += `
+    <tr>
+      <td colspan="6">Нет информации для вывода</td>
+    </tr>
+    `;
+  }
+
+  displayPrint += `
+    </tbody>
+  </table>
+  `;
+
+  document.querySelector("#condition-unit .display-print").innerHTML =
+    displayPrint;
+}
+
+async function ShowVKToUnitMolDate(evt) {
+  evt.preventDefault();
+
+  if (idReadCreate === 0) {
+    window.alert("Не выбрано подразделение");
+    return;
+  }
+
+  let tempDate = document.querySelector("#input-date-showvk-tounit").value;
+
+  document.querySelector("form[name=formFromCreateUnit] h2").innerHTML =
+    "ОТЧЕТ: Покажет всю технику в подразделении ID: " +
+    idReadCreate +
+    " на дату: " +
+    tempDate +
+    " + Материально-ответственное лицо";
+
+  await remote
+    .getGlobal("connectMySQL")
+    .execute(`set @DateTransfer = '${tempDate}';`);
+
+  const [rowsAllVKToUnitMOLDate] = await remote
+    .getGlobal("connectMySQL")
+    .execute(
+      `SELECT unit.Name as 'Подразделение', unitroom.Name as 'Комната', worker.FIO as 'Материально-ответственное лицо', vktounit.DateTransfer as 'Дата перемещения', vk.Name as 'Техника', vktype.Name as 'Тип техники', vk.Cost as 'Стоимость' FROM unit INNER JOIN unitroom ON unit.ID = unitroom.UnitID INNER JOIN vktounit ON unitroom.ID = vktounit.RoomID and vktounit.DateTransfer = (SELECT max(vu.DateTransfer) from vktounit as vu where vu.VKID = vktounit.VKID and vu.DateTransfer <= @DateTransfer) INNER JOIN vk ON vk.ID = vktounit.VKID INNER JOIN vktype ON vktype.ID = vk.TypeID INNER JOIN unitpattern ON unit.ID = unitpattern.UnitID INNER JOIN worker ON worker.ID = unitpattern.ID where unit.ID = ${idReadCreate} and vktounit.DateTransfer <= @DateTransfer and unitpattern.IsMOL = 1 order by unit.Name, unitroom.Name, worker.FIO, vktounit.DateTransfer`
+    );
+
+  let displayPrint = `
+  <table style="font-size: 14px;">
+    <thead>
+      <tr>
+        <th>Подразделение</th>
+        <th>Комната</th>
+        <th>Материально-ответственное лицо</th>
+        <th>Дата перемещения</th>
+        <th>Техника</th>
+        <th>Тип техники</th>
+        <th>Стоимость</th>
+      </tr>
+    </thead>
+    <tbody>
+  `;
+
+  if (rowsAllVKToUnitMOLDate.length) {
+    for (let i = 0; i < rowsAllVKToUnitMOLDate.length; i++) {
+      displayPrint += `
+      <tr>
+        <td>${rowsAllVKToUnitMOLDate[i]["Подразделение"]}</td>
+        <td>${rowsAllVKToUnitMOLDate[i]["Комната"]}</td>
+        <td>${rowsAllVKToUnitMOLDate[i]["Материально-ответственное лицо"]}</td>
+        <td>${moment(rowsAllVKToUnitMOLDate[i]["Дата перемещения"]).format(
+          "YYYY-MM-DD"
+        )}</td>
+        <td>${rowsAllVKToUnitMOLDate[i]["Техника"]}</td>
+        <td>${rowsAllVKToUnitMOLDate[i]["Тип техники"]}</td>
+        <td>${rowsAllVKToUnitMOLDate[i]["Стоимость"]}</td>
+      </tr>
+      `;
+    }
+  } else {
+    displayPrint += `
+    <tr>
+      <td colspan="7">Нет информации для вывода</td>
+    </tr>
+    `;
+  }
+
+  displayPrint += `
+    </tbody>
+  </table>
+  `;
+
+  document.querySelector("#condition-unit .display-print").innerHTML =
+    displayPrint;
+}
+
+async function ShowQuantVKToUnitDate(evt) {
+  evt.preventDefault();
+
+  if (idReadCreate === 0) {
+    window.alert("Не выбрано подразделение");
+    return;
+  }
+
+  let tempDate = document.querySelector("#input-date-showvk-tounit").value;
+
+  document.querySelector("form[name=formFromCreateUnit] h2").innerHTML =
+    "ОТЧЕТ: Покажет количество техники в подразделении ID: " +
+    idReadCreate +
+    " на дату: " +
+    tempDate;
+
+  await remote
+    .getGlobal("connectMySQL")
+    .execute(`set @DateTransfer = '${tempDate}';`);
+
+  const [rowsAllQuantVKToUnitDate] = await remote
+    .getGlobal("connectMySQL")
+    .execute(
+      `select unit.Name as 'Имя подразделения', vktype.Name as 'Имя типа', COUNT(*) as kolvo
+      from unit
+      inner JOIN unitroom on unitroom.UnitID = unit.ID
+      INNER JOIN vktounit on  vktounit.RoomID = unitroom.ID
+      and vktounit.DateTransfer = (SELECT max(vu.DateTransfer) from vktounit as vu where vu.VKID = vktounit.VKID and vu.DateTransfer <= @DateTransfer)
+      INNER join vk on vk.ID = vktounit.VKID
+      INNER join vktype on vktype.ID = vk.TypeID
+      where vktounit.DateTransfer <= @DateTransfer
+      and unit.id = ${idReadCreate}
+      GROUP by unit.Name, vktype.Name
+      order by unit.Name, vktype.Name`
+    );
+
+  let displayPrint = `
+    <table style="font-size: 14px;">
+      <thead>
+        <tr>
+          <th>Имя подразделения</th>
+          <th>Имя типа</th>
+          <th>Колличество</th>
+        </tr>
+      </thead>
+      <tbody>
+    `;
+
+  if (rowsAllQuantVKToUnitDate.length) {
+    for (let i = 0; i < rowsAllQuantVKToUnitDate.length; i++) {
+      displayPrint += `
+        <tr>
+          <td>${rowsAllQuantVKToUnitDate[i]["Имя подразделения"]}</td>
+          <td>${rowsAllQuantVKToUnitDate[i]["Имя типа"]}</td>
+          <td>${rowsAllQuantVKToUnitDate[i]["kolvo"]}</td>
+        </tr>
+        `;
+    }
+  } else {
+    displayPrint += `
+      <tr>
+        <td colspan="3">Нет информации для вывода</td>
+      </tr>
+      `;
+  }
+
+  displayPrint += `
+    </tbody>
+  </table>
+  `;
+
+  document.querySelector("#condition-unit .display-print").innerHTML =
+    displayPrint;
 }
 
 async function CreateUnit(evt) {
@@ -1122,7 +1517,7 @@ async function CreateUnitRoom(evt) {
 }
 
 // показать все перемещения техники
-async function showVKToUnit() {
+async function showVKToUnit(reportParam) {
   const [rowsVKToUnit] = await remote
     .getGlobal("connectMySQL")
     .execute("select * from vktounit");
@@ -1131,9 +1526,61 @@ async function showVKToUnit() {
     .getGlobal("connectMySQL")
     .execute("select * from unitroom");
 
+  [rowsAllUnit] = await remote
+    .getGlobal("connectMySQL")
+    .execute("select * from unit");
+
   [rowsAllVK] = await remote
     .getGlobal("connectMySQL")
     .execute("select * from vk");
+
+  for (
+    let i =
+      document.querySelector("select[name=FromVKNameMove]").options.length - 1;
+    i >= 0;
+    i--
+  ) {
+    document.querySelector("select[name=FromVKNameMove]").options[i] = null;
+  } // Очищаем выпадающие списки
+
+  if (rowsAllVK.length) {
+    for (let j = 0; j < rowsAllVK.length; j++) {
+      let newOption1 = new Option(rowsAllVK[j]["Name"], rowsAllVK[j]["ID"]);
+
+      document.querySelector("select[name=FromVKNameMove]").options[
+        document.querySelector("select[name=FromVKNameMove]").length
+      ] = newOption1;
+    }
+  }
+
+  document.querySelector("#input-name-date-move").placeholder =
+    moment().format("YYYY-MM-DD");
+
+  document.querySelector("#input-name-date-move").value =
+    moment().format("YYYY-MM-DD");
+
+  for (
+    let i =
+      document.querySelector("select[name=FromUnitRoomMove]").options.length -
+      1;
+    i >= 0;
+    i--
+  ) {
+    document.querySelector("select[name=FromUnitRoomMove]").options[i] = null;
+  } // Очищаем выпадающие списки
+
+  if (rowsAllUnitRoom.length) {
+    for (let j = 0; j < rowsAllUnitRoom.length; j++) {
+      let newOption1 = new Option(
+        rowsAllUnitRoom[j]["Name"],
+        rowsAllUnitRoom[j]["ID"]
+      );
+
+      document.querySelector("select[name=FromUnitRoomMove]").options[
+        document.querySelector("select[name=FromUnitRoomMove]").length
+      ] = newOption1;
+    }
+  }
 
   let displayPrint = `
       <table style="font-size: 14px;">
@@ -1142,20 +1589,58 @@ async function showVKToUnit() {
             <th>ID</th>
             <th>Техника</th>
             <th>Дата перемещения</th>
-            <th>Комната</th>
+            <th>Комната : Подразделение</th>
           </tr>
         </thead>
         <tbody>
       `;
 
   if (rowsVKToUnit.length) {
-    for (let i = 0; i < rowsVKToUnit.length; i++) {
+    let i;
+
+    if (reportParam === "all") {
+      document.querySelector("#butt-show-report-vktounit").innerHTML =
+        "Последние пять";
+      document.querySelector("form[name=formFromMoveVKToUnit] h2").innerHTML =
+        "ОТЧЕТ: Показываются все перемещения техники";
+
+      i = 0;
+
+      statusVKToUnitShow = 1;
+    } else if (reportParam === "five") {
+      document.querySelector("#butt-show-report-vktounit").innerHTML =
+        "Показать десять";
+      document.querySelector("form[name=formFromMoveVKToUnit] h2").innerHTML =
+        "ОТЧЕТ: Показываются последние пять перемещений техники";
+
+      i = rowsVKToUnit.length - 5;
+
+      statusVKToUnitShow = 2;
+    } else if (reportParam === "ten") {
+      document.querySelector("#butt-show-report-vktounit").innerHTML =
+        "Показать все";
+      document.querySelector("form[name=formFromMoveVKToUnit] h2").innerHTML =
+        "ОТЧЕТ: Показываются последние десять перемещений техники";
+
+      i = rowsVKToUnit.length - 10;
+
+      statusVKToUnitShow = 0;
+    }
+
+    for (; i < rowsVKToUnit.length; i++) {
       let tempUnitRoomName = "";
+      let tempUnitName = "";
       let tempVKName = "";
 
       for (let j = 0; j < rowsAllUnitRoom.length; j++) {
         if (rowsVKToUnit[i]["RoomID"] === rowsAllUnitRoom[j]["ID"]) {
           tempUnitRoomName = rowsAllUnitRoom[j]["Name"];
+          tempUnitName = rowsAllUnitRoom[j]["UnitID"];
+
+          for (let k = 0; k < rowsAllUnit.length; k++) {
+            if (tempUnitName === rowsAllUnit[k]["ID"])
+              tempUnitName = rowsAllUnit[k]["Name"];
+          }
         }
       }
 
@@ -1172,7 +1657,7 @@ async function showVKToUnit() {
             <td>${moment(rowsVKToUnit[i]["DateTransfer"]).format(
               "YYYY-MM-DD"
             )}</td>
-            <td>${tempUnitRoomName}</td>
+            <td>${tempUnitRoomName} : ${tempUnitName}</td>
           </tr>
           `;
     }
@@ -1191,4 +1676,29 @@ async function showVKToUnit() {
 
   document.querySelector("#condition-vktounit .display-print").innerHTML =
     displayPrint;
+}
+
+async function MoveVKToUnit(evt) {
+  evt.preventDefault();
+  let indexVKNameMove = document.querySelector("select[name=FromVKNameMove]")
+    .options.selectedIndex;
+  let valueVKNameMove = document.querySelector("select[name=FromVKNameMove]")
+    .options[indexVKNameMove].value;
+
+  let dateMove = document.querySelector("#input-name-date-move").value;
+
+  let indexUnitRoomMoveVK = document.querySelector(
+    "select[name=FromUnitRoomMove]"
+  ).options.selectedIndex;
+  let valueUnitRoomMoveVK = document.querySelector(
+    "select[name=FromUnitRoomMove]"
+  ).options[indexUnitRoomMoveVK].value;
+
+  await remote
+    .getGlobal("connectMySQL")
+    .execute(
+      `insert into vktounit (VKID, DateTransfer, RoomID) values ('${valueVKNameMove}', '${dateMove}', '${valueUnitRoomMoveVK}')`
+    );
+
+  await showVKToUnit("five");
 }

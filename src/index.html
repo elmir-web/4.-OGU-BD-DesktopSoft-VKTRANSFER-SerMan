@@ -79,6 +79,11 @@
                 <option value="qwqwqwqwqwq">qwqwqwqwqwq</option>
               </select>
               <button id="butt-create-vk">Изменить/Создать</button>
+              <button id="butt-show-vk">Сбросить таблицу</button>
+              <br />
+              <br />
+              <h2>ОТЧЕТ: Все движения техники по подразделениям</h2>
+              <button id="butt-show-report-vkmoving-tounit">Отчет</button>
             </form>
           </div>
         </section>
@@ -96,6 +101,11 @@
                 placeholder="Введите ФИО"
               />
               <button id="butt-create-worker">Изменить/Создать</button>
+              <button id="butt-show-worker">Сбросить таблицу</button>
+              <br />
+              <br />
+              <h2>ОТЧЕТ: Начальники</h2>
+              <button id="butt-show-report-boss-unit">Отчет</button>
             </form>
           </div>
         </section>
@@ -123,6 +133,20 @@
                 placeholder="Введите сокращение"
               />
               <button id="butt-create-unit">Изменить/Создать</button>
+              <button id="butt-show-unit">Сбросить таблицу</button>
+              <br />
+              <br />
+              <h2>ОТЧЕТ: Покажет всю технику в подразделении на дату</h2>
+              <input
+                type="text"
+                id="input-date-showvk-tounit"
+                placeholder="Введите номер"
+              />
+              <button id="butt-show-report-vk-tounit-date">Отчет</button>
+              <button id="butt-show-report-vk-tounit-mol-date">+ МОЛ</button>
+              <button id="butt-show-report-quantvk-tounit-date">
+                Количество
+              </button>
             </form>
           </div>
         </section>
@@ -187,6 +211,33 @@
         </section>
 
         <section id="condition-vktounit">
+          <div class="display-controller">
+            <h2>Переместить технику</h2>
+
+            <form name="formFromMoveVKToUnit">
+              <select name="FromVKNameMove" size="1">
+                <option value="fsdfsdf">fsdfsdf</option>
+                <option value="323232323">323232323</option>
+                <option value="qwqwqwqwqwq">qwqwqwqwqwq</option>
+              </select>
+              <input
+                type="text"
+                id="input-name-date-move"
+                placeholder="Введите дату"
+              />
+              <select name="FromUnitRoomMove" size="1">
+                <option value="fsdfsdf">fsdfsdf</option>
+                <option value="323232323">323232323</option>
+                <option value="qwqwqwqwqwq">qwqwqwqwqwq</option>
+              </select>
+              <button id="butt-move-VKToUnit">Переместить</button>
+              <br /><br />
+              <h2>ОТЧЕТ: Показываются последние пять перемещений техники</h2>
+              <button id="butt-show-report-vktounit">Показать все</button>
+            </form>
+          </div>
+          <br />
+
           <div class="display-print">
             [ отображение таблицы перемещения техники ]
           </div>

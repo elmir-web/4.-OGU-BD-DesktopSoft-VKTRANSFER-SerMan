@@ -9,8 +9,7 @@ INNER join vk on vk.ID = vktounit.VKID
 INNER join vktype on vktype.ID = vk.TypeID
 
 where vktounit.DateTransfer <= @DateTransfer
---  and vk.id = 1
---  and unit.id = 1
+  and unit.id = 1
 GROUP by unit.Name, vktype.Name
 order by unit.Name, vktype.Name
 
